@@ -1,6 +1,21 @@
 
 let transfers=[],routes=[],clubs=[],meta={};const $=s=>document.querySelector(s);const money=n=>n?new Intl.NumberFormat('en-GB',{style:'currency',currency:'EUR',notation:'compact',maximumFractionDigits:1}).format(n):'—';
-Promise.all(['transfers','routes','clubs','meta'].map(x=>fetch(`data/${x}.json`).then(r=>r.json()))).then(([t,r,c,m])=>{transfers=t;routes=r;clubs=c;meta=m;init()});
+async function loadJson(name){
+  for(const path of [`${name}.json`,`data/${name}.json`]){
+    try{
+      const response=await fetch(path,{cache:'no-store'});
+      if(response.ok)return await response.json();
+    }catch(error){}
+  }
+  throw new Error(`Could not load ${name}.json`);
+}
+Promise.all(['transfers','routes','clubs','meta'].map(loadJson))
+  .then(([t,r,c,m])=>{transfers=t;routes=r;clubs=c;meta=m;init()})
+  .catch(error=>{
+    console.error(error);
+    const target=document.querySelector('#routeView')||document.body;
+    target.innerHTML=`<div class=error><h2>Data failed to load</h2><p>${esc(error.message)}. Check that the JSON files are in the repository root or in a data folder.</p></div>`;
+  });
 function init(){document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')});
 $('#summary').innerHTML=`<div class=card><b>${meta.transfer_count.toLocaleString()}</b><span>canonical movements</span></div><div class=card><b>${meta.bidirectional_route_count.toLocaleString()}</b><span>bidirectional routes</span></div><div class=card><b>5</b><span>major leagues</span></div><div class=card><b>11</b><span>seasons</span></div>`;
 const opts=['<option value="">Select club</option>',...clubs.map(x=>`<option>${esc(x)}</option>`)].join('');$('#clubA').innerHTML=opts;$('#clubB').innerHTML=opts;$('#showRoute').onclick=()=>showPair($('#clubA').value,$('#clubB').value);
