@@ -112,13 +112,13 @@ function showPair(a,b,scroll=true){
     );
 
     if(!route){
-        msg.textContent =
-            'This pair does not have eligible movements in both directions.';
-        msg.hidden=false;
-        $('#transferFilter').hidden=false;
-      $('#routeView').innerHTML='';
-        return;
-    }
+    msg.textContent =
+        'This pair does not have eligible movements in both directions.';
+    msg.hidden=false;
+    $('#transferFilter').hidden = false;
+        $('#routeView').innerHTML='';
+    return;
+}
 
     history.replaceState(
         null,
