@@ -6,6 +6,7 @@ let transfers=[],
     meta={};
 
 let transferFilter="permanent";
+let currentRelationship = null;
 const $=s=>document.querySelector(s);
 const LEAGUE_ORDER=['Premier League','La Liga','Bundesliga','Serie A','Ligue 1'];
 const LEAGUE_LABELS={'Premier League':'England — Premier League','La Liga':'Spain — La Liga','Bundesliga':'Germany — Bundesliga','Serie A':'Italy — Serie A','Ligue 1':'France — Ligue 1','Other clubs':'Other clubs'};
@@ -53,7 +54,7 @@ function init(){
             const b=$('#clubB').value;
 
             if(a && b)
-                showPair(a,b,false);
+                refreshRelationship();
 
         });
 
@@ -128,90 +129,21 @@ function showPair(a,b,scroll=true){
     const exchangeRelationship =
         findSameWindowRelationship(a,b);
 
-    const exchangeSection =
-        renderSameWindowExchanges(
-            exchangeRelationship,
-            a,
-            b
-        );
- 
-    const firstSeason =
-        rr.at(-1)?.season_label || '—';
+    currentRelationship = {
 
-    const latestSeason =
-        rr[0]?.season_label || '—';
+    clubA : a,
 
-const filteredTransfers = getFilteredTransfers(rr);
+    clubB : b,
 
-const permanentTransfers =
-    filteredTransfers.filter(t => !t.is_loan).length;
+    route,
 
-const loanTransfers =
-    filteredTransfers.filter(t => t.is_loan).length;
+    transfers : rr,
 
-const totalTransfers =
-    filteredTransfers.length;
+    exchanges : exchangeRelationship
 
-const uniquePlayers =
-    new Set(filteredTransfers.map(t => t.player_name)).size;
-      
-const relationshipSummary = `
-        <h2 class="route-title">${esc(a)} ↔ ${esc(b)}</h2>
+};
 
-        <div class="cards">
-
-            <div class="card">
-                <b>${totalTransfers}</b>
-                <span>Total movements</span>
-            </div>
-
-            <div class="card">
-                <b>${uniquePlayers}</b>
-                <span>Unique players</span>
-            </div>
-
-            <div class="card">
-                <b>${permanentTransfers}</b>
-                <span>Permanent</span>
-            </div>
-
-            <div class="card">
-                <b>${loanTransfers}</b>
-                <span>Loans</span>
-            </div>
-
-            <div class="card">
-                <b>${route.balance_pct}%</b>
-                <span>Balance</span>
-            </div>
-
-            <div class="card">
-                <b>${firstSeason}–${latestSeason}</b>
-                <span>Relationship span</span>
-            </div>
-
-        </div>
-
-        <p class="direction">
-            ${esc(route.club_a)} → ${esc(route.club_b)}:
-            ${route.a_to_b}
-
-            &nbsp;&nbsp;·&nbsp;&nbsp;
-
-            ${esc(route.club_b)} → ${esc(route.club_a)}:
-            ${route.b_to_a}
-        </p>
-    `;
-
-    const transferTable = renderTransferTable(rr);
-
-    $('#routeView').innerHTML =
-
-        relationshipSummary +
-
-        exchangeSection +
-
-        transferTable;
+refreshRelationship();
 
     if(scroll){
 
@@ -226,6 +158,45 @@ const relationshipSummary = `
     }
 }
 
+function refreshRelationship(){
+
+    if(!currentRelationship)
+        return;
+
+    const rr =
+        getFilteredTransfers(
+            currentRelationship.transfers
+        );
+
+    const summary =
+        renderRelationshipSummary(
+            currentRelationship,
+            rr
+        );
+
+    const exchanges =
+        renderSameWindowExchanges(
+
+            currentRelationship.exchanges,
+
+            currentRelationship.clubA,
+
+            currentRelationship.clubB
+
+        );
+
+    const table =
+        renderTransferTable(rr);
+
+    $('#routeView').innerHTML =
+
+        summary +
+
+        exchanges +
+
+        table;
+
+}
 function findSameWindowRelationship(a,b){
   return sameWindowExchanges.relationships.find(r=>(r.club_a===a&&r.club_b===b)||(r.club_a===b&&r.club_b===a))||null;
 }
