@@ -1,12 +1,28 @@
 'use strict';
-let transfers=[],routes=[],clubs=[],meta={};
+let transfers=[],routes=[],clubs=[],sameWindowExchanges={relationships:[]},meta={};
 const $=s=>document.querySelector(s);
 const LEAGUE_ORDER=['Premier League','La Liga','Bundesliga','Serie A','Ligue 1'];
 const LEAGUE_LABELS={'Premier League':'England — Premier League','La Liga':'Spain — La Liga','Bundesliga':'Germany — Bundesliga','Serie A':'Italy — Serie A','Ligue 1':'France — Ligue 1','Other clubs':'Other clubs'};
 const normaliseLeague=x=>({'Laliga':'La Liga','LaLiga':'La Liga','Primera División':'La Liga'}[x]||x||'');
 const money=n=>n?new Intl.NumberFormat('en-GB',{style:'currency',currency:'EUR',notation:'compact',maximumFractionDigits:1}).format(n):'—';
 async function loadJson(name){for(const path of [`${name}.json`,`data/${name}.json`]){try{const response=await fetch(path,{cache:'no-store'});if(response.ok)return await response.json()}catch(error){}}throw new Error(`Could not load ${name}.json`)}
-Promise.all(['transfers','routes','clubs','meta'].map(loadJson)).then(([t,r,c,m])=>{transfers=t;routes=r;clubs=c;meta=m;init()}).catch(showLoadError);
+Promise.all(['transfers','routes','clubs','same_window_exchanges','meta'].map(loadJson)).then(([t,r,c,s,m])=>{transfers=t;routes=r;clubs=c;sameWindowExchanges=s;validateSameWindowData();meta=m;init()}).catch(showLoadError);
+
+function validateSameWindowData(){
+  const relationships=sameWindowExchanges?.relationships;
+  if(!Array.isArray(relationships))throw new Error('same_window_exchanges.json has an invalid schema');
+  const seen=new Set();
+  for(const relationship of relationships){
+    const pairKey=`${relationship.club_a}|${relationship.club_b}`;
+    if(seen.has(pairKey))throw new Error(`Duplicate same-window relationship: ${pairKey}`);
+    seen.add(pairKey);
+    for(const exchange of relationship.same_window_exchanges||[]){
+      if(!exchange.club_a_to_b?.length||!exchange.club_b_to_a?.length)throw new Error(`Invalid same-window exchange: ${pairKey} ${exchange.season} ${exchange.window}`);
+    }
+  }
+  console.info(`TM-021A loaded: ${relationships.length.toLocaleString('en-GB')} relationships, ${Number(sameWindowExchanges.exchange_window_count||0).toLocaleString('en-GB')} same-window exchanges.`);
+}
+
 function showLoadError(error){console.error(error);$('#summary').innerHTML=`<div class="error"><strong>Data failed to load.</strong><br>${esc(error.message)}. Check that all JSON files are in the repository root.</div>`}
 function init(){
   document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>activateTab(b.dataset.tab));

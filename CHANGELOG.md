@@ -1,18 +1,19 @@
 # Changelog
 
-## v0.1.1 beta
-
-### Fixed
-- La Liga Top 10 now populates correctly.
-- Non-club entities no longer appear in route rankings or selectors.
-- Route ranks are recalculated after exclusions.
+## v0.2.0 — TM-021A data engine
 
 ### Added
-- Country/league grouped club selectors.
-- Eligible-club and eligible-route summary metrics.
-- Machine-readable quality report.
-- Richer route summary cards and improved methodology notes.
 
-### Changed
-- Rebranded the product as Transfer Mates.
-- Improved mobile layout, table scrolling and empty/error states.
+- Precomputed `same_window_exchanges.json` for eligible bidirectional club relationships.
+- Canonical relationship IDs and route references.
+- Transfer-level detail for every qualifying season/window in both directions.
+- Loan flags and transfer types to support the forthcoming permanent/loan filter.
+- Browser-side schema and integrity validation when the data loads.
+
+### Definition
+
+A same-window exchange is a season and transfer window in which at least one eligible player movement occurred in each direction between the same two clubs. One-way windows are excluded.
+
+### Scope
+
+This task adds the TM-021A data engine only. No visible interface changes are included yet.
