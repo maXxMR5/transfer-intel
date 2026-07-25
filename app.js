@@ -1,5 +1,11 @@
 'use strict';
-let transfers=[],routes=[],clubs=[],sameWindowExchanges={relationships:[]},meta={};
+let transfers=[],
+    routes=[],
+    clubs=[],
+    sameWindowExchanges={relationships:[]},
+    meta={};
+
+let transferFilter="permanent";
 const $=s=>document.querySelector(s);
 const LEAGUE_ORDER=['Premier League','La Liga','Bundesliga','Serie A','Ligue 1'];
 const LEAGUE_LABELS={'Premier League':'England — Premier League','La Liga':'Spain — La Liga','Bundesliga':'Germany — Bundesliga','Serie A':'Italy — Serie A','Ligue 1':'France — Ligue 1','Other clubs':'Other clubs'};
@@ -29,6 +35,29 @@ function init(){
   $('#summary').innerHTML=`<div class="card"><b>${fmt(meta.transfer_count)}</b><span>canonical movements</span></div><div class="card"><b>${fmt(meta.bidirectional_route_count)}</b><span>eligible routes</span></div><div class="card"><b>${fmt(meta.eligible_club_count||clubs.length)}</b><span>eligible clubs</span></div><div class="card"><b>5</b><span>major leagues</span></div><div class="card"><b>11</b><span>seasons</span></div>`;
   buildClubSelectors();
   $('#showRoute').onclick=()=>showPair($('#clubA').value,$('#clubB').value);
+  document
+    .querySelectorAll('.filter-btn')
+    .forEach(btn=>{
+
+        btn.onclick=()=>{
+
+            document
+                .querySelectorAll('.filter-btn')
+                .forEach(x=>x.classList.remove('active'));
+
+            btn.classList.add('active');
+
+            transferFilter=btn.dataset.filter;
+
+            const a=$('#clubA').value;
+            const b=$('#clubB').value;
+
+            if(a && b)
+                showPair(a,b,false);
+
+        };
+
+    });
   LEAGUE_ORDER.forEach(l=>$('#routeLeague').insertAdjacentHTML('beforeend',`<option value="${esc(l)}">${esc(l)}</option>`));
   $('#routeSearch').oninput=renderRoutes;$('#routeLeague').onchange=renderRoutes;
   renderRoutes();renderLeagues();
@@ -56,6 +85,7 @@ function showPair(a,b,scroll=true){
     const msg = $('#routeMessage');
 
     msg.hidden = true;
+  $('#transferFilter').hidden=true;
 
     if(!a || !b){
         msg.textContent = 'Choose two clubs to view a relationship.';
@@ -85,7 +115,8 @@ function showPair(a,b,scroll=true){
         msg.textContent =
             'This pair does not have eligible movements in both directions.';
         msg.hidden=false;
-        $('#routeView').innerHTML='';
+        $('#transferFilter').hidden=false;
+      $('#routeView').innerHTML='';
         return;
     }
 
@@ -111,11 +142,14 @@ function showPair(a,b,scroll=true){
     const latestSeason =
         rr[0]?.season_label || '—';
 
-    const permanentTransfers =
-        rr.filter(t=>!t.is_loan).length;
+const filteredTransfers =
+    getFilteredTransfers(rr);
 
-    const loanTransfers =
-        rr.filter(t=>t.is_loan).length;
+const permanentTransfers =
+    filteredTransfers.filter(t=>!t.is_loan).length;
+
+const loanTransfers =
+    filteredTransfers.filter(t=>t.is_loan).length;
       const relationshipSummary = `
         <h2 class="route-title">${esc(a)} ↔ ${esc(b)}</h2>
 
@@ -208,6 +242,7 @@ function renderExchangeDirection(fromClub,toClub,movements){
   return `<article class="exchange-direction"><h4>${esc(fromClub)} <span>→</span> ${esc(toClub)}</h4><ul>${movements.map(m=>`<li><div><b>${esc(m.player_name)}</b><span>${m.is_loan?'Loan':esc(labelType(m.transfer_type))}${m.age!=null?` · Age ${m.age}`:''}</span></div><strong class="money">${money(m.fee_eur)}</strong></li>`).join('')}</ul></article>`;
 }
  function renderTransferTable(rr){
+   const filtered = getFilteredTransfers(rr);
 
     return `
         <section class="route-transfers">
@@ -223,7 +258,7 @@ function renderExchangeDirection(fromClub,toClub,movements){
                 </div>
 
                 <span class="muted">
-                    ${fmt(rr.length)} transfers
+                    ${fmt(filtered.length)} transfers
                 </span>
 
             </div>
@@ -254,7 +289,7 @@ function renderExchangeDirection(fromClub,toClub,movements){
 
                     <tbody>
 
-                        ${rr.map(renderTransferRow).join('')}
+                        ${filtered.map(renderTransferRow).join('')}
 
                     </tbody>
 
@@ -264,6 +299,27 @@ function renderExchangeDirection(fromClub,toClub,movements){
 
         </section>
     `;
+
+}
+function getFilteredTransfers(rr){
+
+    switch(transferFilter){
+
+        case "permanent":
+
+            return rr.filter(t=>!t.is_loan);
+
+        case "permanent_loans":
+
+            return rr.filter(t=>
+                t.transfer_type!=="end_of_loan"
+            );
+
+        default:
+
+            return rr;
+
+    }
 
 }
   function renderTransferRow(x){
