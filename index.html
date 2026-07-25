@@ -32,8 +32,34 @@
         <label>Second club<select id="clubB"><option>Loading clubs…</option></select></label>
         <button id="showRoute" class="btn">Show route</button>
       </div>
-      <div id="routeMessage" class="message" hidden></div>
-      <div id="routeView"></div>
+<div id="routeMessage" class="message" hidden></div>
+
+<div id="transferFilter" class="transfer-filter" hidden>
+
+    <span class="filter-label">Transfer type</span>
+
+    <div class="filter-buttons">
+
+        <button class="filter-btn active"
+                data-filter="permanent">
+            Permanent
+        </button>
+
+        <button class="filter-btn"
+                data-filter="permanent_loans">
+            Permanent + Loans
+        </button>
+
+        <button class="filter-btn"
+                data-filter="all">
+            All
+        </button>
+
+    </div>
+
+</div>
+
+<div id="routeView"></div>
     </section>
 
     <section class="surface">
