@@ -141,26 +141,32 @@ function showPair(a,b,scroll=true){
     const latestSeason =
         rr[0]?.season_label || '—';
 
-const filteredTransfers =
-    getFilteredTransfers(rr);
+const filteredTransfers = getFilteredTransfers(rr);
 
 const permanentTransfers =
-    filteredTransfers.filter(t=>!t.is_loan).length;
+    filteredTransfers.filter(t => !t.is_loan).length;
 
 const loanTransfers =
-    filteredTransfers.filter(t=>t.is_loan).length;
-      const relationshipSummary = `
+    filteredTransfers.filter(t => t.is_loan).length;
+
+const totalTransfers =
+    filteredTransfers.length;
+
+const uniquePlayers =
+    new Set(filteredTransfers.map(t => t.player_name)).size;
+      
+const relationshipSummary = `
         <h2 class="route-title">${esc(a)} ↔ ${esc(b)}</h2>
 
         <div class="cards">
 
             <div class="card">
-                <b>${route.total}</b>
+                <b>${totalTransfers}</b>
                 <span>Total movements</span>
             </div>
 
             <div class="card">
-                <b>${route.unique_players}</b>
+                <b>${uniquePlayers}</b>
                 <span>Unique players</span>
             </div>
 
@@ -306,13 +312,18 @@ function getFilteredTransfers(rr){
 
         case "permanent":
 
-            return rr.filter(t=>!t.is_loan);
+            return rr.filter(t =>
+                !t.is_loan &&
+                t.transfer_type !== "end_of_loan"
+            );
 
         case "permanent_loans":
 
-            return rr.filter(t=>
-                t.transfer_type!=="end_of_loan"
+            return rr.filter(t =>
+                t.transfer_type !== "end_of_loan"
             );
+
+        case "all":
 
         default:
 
