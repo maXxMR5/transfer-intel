@@ -52,18 +52,272 @@ function renderRoutes(){
   $('#routeRows').querySelectorAll('tr[data-a]').forEach(row=>row.onclick=()=>showPair(row.dataset.a,row.dataset.b));
 }
 function showPair(a,b,scroll=true){
-  const msg=$('#routeMessage');msg.hidden=true;
-  if(!a||!b){msg.textContent='Choose two clubs to view a relationship.';msg.hidden=false;return}
-  if(a===b){msg.textContent='Choose two different clubs.';msg.hidden=false;return}
-  const rr=transfers.filter(x=>(x.from_club===a&&x.to_club===b)||(x.from_club===b&&x.to_club===a)).sort(sortTransfers);
-  const route=routes.find(r=>(r.club_a===a&&r.club_b===b)||(r.club_a===b&&r.club_b===a));
-  if(!route){msg.textContent='This pair does not have eligible movements in both directions.';msg.hidden=false;$('#routeView').innerHTML='';return}
-  const first=rr.at(-1)?.season_label||'—',latest=rr[0]?.season_label||'—',permanent=route.total-route.loans;
-  history.replaceState(null,'',`?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`);
-  const exchangeRelationship=findSameWindowRelationship(a,b);
-  const exchangeSection=renderSameWindowExchanges(exchangeRelationship,a,b);
-  $('#routeView').innerHTML=`<h2 class="route-title">${esc(a)} ↔ ${esc(b)}</h2><div class="cards"><div class="card"><b>${route.total}</b><span>movements</span></div><div class="card"><b>${route.unique_players}</b><span>unique players</span></div><div class="card"><b>${permanent}</b><span>non-loans</span></div><div class="card"><b>${route.loans}</b><span>loans</span></div><div class="card"><b>${route.balance_pct}%</b><span>directional balance</span></div><div class="card"><b>${esc(first)}–${esc(latest)}</b><span>recorded span</span></div></div><p class="direction">${esc(route.club_a)} → ${esc(route.club_b)}: ${route.a_to_b} &nbsp; · &nbsp; ${esc(route.club_b)} → ${esc(route.club_a)}: ${route.b_to_a}</p>${exchangeSection}<section class="route-transfers"><div class="section-heading compact-heading"><div><p class="eyebrow">Full history</p><h3>All recorded movements</h3></div><span class="muted">${fmt(rr.length)} transfers</span></div><div class="tablebox"><table><thead><tr><th>Season</th><th>Window</th><th>Player</th><th>Direction</th><th>Type</th><th>Fee</th><th>Age</th><th>Position</th><th>Confidence</th></tr></thead><tbody>${rr.map(x=>`<tr><td>${esc(x.season_label)}</td><td>${title(x.window)}</td><td><b>${esc(x.player_name)}</b></td><td>${esc(x.from_club)} → ${esc(x.to_club)}</td><td><span class="pill ${x.is_loan?'loan':''}">${x.is_loan?'Loan':esc(labelType(x.transfer_type))}</span></td><td class="money">${money(x.fee_eur)}</td><td>${x.age??'—'}</td><td>${esc(x.position||'—')}</td><td>${esc(x.fee_status)}</td></tr>`).join('')}</tbody></table></div></section>`;
-  if(scroll)$('#routeView').scrollIntoView({behavior:'smooth',block:'start'});
+
+    const msg = $('#routeMessage');
+
+    msg.hidden = true;
+
+    if(!a || !b){
+        msg.textContent = 'Choose two clubs to view a relationship.';
+        msg.hidden = false;
+        return;
+    }
+
+    if(a===b){
+        msg.textContent='Choose two different clubs.';
+        msg.hidden=false;
+        return;
+    }
+
+    const rr = transfers
+        .filter(t =>
+            (t.from_club===a && t.to_club===b) ||
+            (t.from_club===b && t.to_club===a)
+        )
+        .sort(sortTransfers);
+
+    const route = routes.find(r =>
+        (r.club_a===a && r.club_b===b) ||
+        (r.club_a===b && r.club_b===a)
+    );
+
+    if(!route){
+        msg.textContent =
+            'This pair does not have eligible movements in both directions.';
+        msg.hidden=false;
+        $('#routeView').innerHTML='';
+        return;
+    }
+
+    history.replaceState(
+        null,
+        '',
+        `?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`
+    );
+
+    const exchangeRelationship =
+        findSameWindowRelationship(a,b);
+
+    const exchangeSection =
+        renderSameWindowExchanges(
+            exchangeRelationship,
+            a,
+            b
+        );
+  function renderTransferTable(rr){
+
+    return `
+        <section class="route-transfers">
+
+            <div class="section-heading compact-heading">
+
+                <div>
+
+                    <p class="eyebrow">Full history</p>
+
+                    <h3>All recorded movements</h3>
+
+                </div>
+
+                <span class="muted">
+                    ${fmt(rr.length)} transfers
+                </span>
+
+            </div>
+
+            <div class="tablebox">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Season</th>
+
+                            <th>Window</th>
+
+                            <th>Player</th>
+
+                            <th>Direction</th>
+
+                            <th class="fee-col">Fee</th>
+
+                            <th>Type</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        ${rr.map(renderTransferRow).join('')}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+    `;
+
+}
+  function renderTransferRow(x){
+
+    return `
+        <tr>
+
+            <td>${esc(x.season_label)}</td>
+
+            <td>${title(x.window)}</td>
+
+            <td>
+                <strong>${esc(x.player_name)}</strong>
+            </td>
+
+            <td>
+                ${esc(x.from_club)}
+                →
+                ${esc(x.to_club)}
+            </td>
+
+            <td class="money fee-col">
+                ${formatTransferFee(x)}
+            </td>
+
+            <td>
+                ${renderTransferBadge(x)}
+            </td>
+
+        </tr>
+    `;
+
+}
+function renderTransferBadge(x){
+
+    const type = (x.transfer_type || '').toLowerCase();
+
+    if(type==="loan")
+        return '<span class="pill loan">Loan</span>';
+
+    if(type==="loan_with_option")
+        return '<span class="pill loan-option">Loan + Option</span>';
+
+    if(type==="loan_with_obligation")
+        return '<span class="pill loan-obligation">Loan + Obligation</span>';
+
+    if(type==="end_of_loan")
+        return '<span class="pill end-loan">End of Loan</span>';
+
+    return '<span class="pill permanent">Permanent</span>';
+
+}
+  function formatTransferFee(x){
+
+    if(x.transfer_type==="loan")
+        return "Loan";
+
+    if((x.fee_status||'').toLowerCase()==="free")
+        return "Free";
+
+    if(x.fee_eur===null || x.fee_eur===undefined)
+        return "Undisclosed";
+
+    const value = Number(x.fee_eur);
+
+    if(Number.isNaN(value))
+        return "Undisclosed";
+
+    if(value>=1000000)
+        return `€${(value/1000000).toFixed(1)}m`;
+
+    if(value>=1000)
+        return `€${Math.round(value/1000)}k`;
+
+    return `€${value}`;
+
+}
+    const firstSeason =
+        rr.at(-1)?.season_label || '—';
+
+    const latestSeason =
+        rr[0]?.season_label || '—';
+
+    const permanentTransfers =
+        rr.filter(t=>!t.is_loan).length;
+
+    const loanTransfers =
+        rr.filter(t=>t.is_loan).length;
+      const relationshipSummary = `
+        <h2 class="route-title">${esc(a)} ↔ ${esc(b)}</h2>
+
+        <div class="cards">
+
+            <div class="card">
+                <b>${route.total}</b>
+                <span>Total movements</span>
+            </div>
+
+            <div class="card">
+                <b>${route.unique_players}</b>
+                <span>Unique players</span>
+            </div>
+
+            <div class="card">
+                <b>${permanentTransfers}</b>
+                <span>Permanent</span>
+            </div>
+
+            <div class="card">
+                <b>${loanTransfers}</b>
+                <span>Loans</span>
+            </div>
+
+            <div class="card">
+                <b>${route.balance_pct}%</b>
+                <span>Balance</span>
+            </div>
+
+            <div class="card">
+                <b>${firstSeason}–${latestSeason}</b>
+                <span>Relationship span</span>
+            </div>
+
+        </div>
+
+        <p class="direction">
+            ${esc(route.club_a)} → ${esc(route.club_b)}:
+            ${route.a_to_b}
+
+            &nbsp;&nbsp;·&nbsp;&nbsp;
+
+            ${esc(route.club_b)} → ${esc(route.club_a)}:
+            ${route.b_to_a}
+        </p>
+    `;
+
+    const transferTable = renderTransferTable(rr);
+
+    $('#routeView').innerHTML =
+
+        relationshipSummary +
+
+        exchangeSection +
+
+        transferTable;
+
+    if(scroll){
+
+        $('#routeView').scrollIntoView({
+
+            behavior:'smooth',
+
+            block:'start'
+
+        });
+
+    }
 }
 
 function findSameWindowRelationship(a,b){
