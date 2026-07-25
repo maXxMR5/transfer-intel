@@ -2,95 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#07111f">
-  <meta name="description" content="Transfer Mates reveals the club-to-club relationships behind football transfers across Europe's Big Five leagues.">
-  <title>Transfer Mates — Football transfer relationships</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore bidirectional football transfer relationships across Europe's Big Five leagues.">
+  <title>Transfer Mates</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="loading" class="loading-screen" role="status" aria-live="polite">
-    <div class="loader-ball" aria-hidden="true">↔</div>
-    <strong>Loading Transfer Mates…</strong>
-    <span>Preparing the transfer relationship database</span>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="brand-row"><span class="brand-mark">↔</span><span class="version">v0.1.1 beta</span></div>
+    <h1>Transfer Mates</h1>
+    <p>Discover the hidden relationships behind football transfers across Europe’s Big Five leagues, 2015/16–2025/26.</p>
   </div>
+</header>
+<main class="wrap">
+  <nav class="tabs" aria-label="Main navigation">
+    <button class="active" data-tab="routes">Route Explorer</button>
+    <button data-tab="leagues">League Rankings</button>
+    <button data-tab="about">Methodology</button>
+  </nav>
 
-  <header class="site-header">
-    <div class="brand-row">
-      <div>
-        <div class="eyebrow"><span class="status-dot"></span> Public beta · RC1</div>
-        <h1>Transfer Mates</h1>
-        <p>Discover the hidden relationships behind football transfers.</p>
+  <section id="routes" class="panel active">
+    <div id="summary" class="cards" aria-live="polite"><div class="loading">Loading transfer database…</div></div>
+    <section class="surface">
+      <div class="section-heading"><div><p class="eyebrow">Explore a relationship</p><h2>Choose two clubs</h2></div></div>
+      <div class="controls route-controls">
+        <label>First club<select id="clubA"><option>Loading clubs…</option></select></label>
+        <span class="swap">↔</span>
+        <label>Second club<select id="clubB"><option>Loading clubs…</option></select></label>
+        <button id="showRoute" class="btn">Show route</button>
       </div>
-      <div class="season-chip">2015/16–2025/26</div>
-    </div>
-  </header>
-
-  <main class="wrap">
-    <section class="hero" aria-labelledby="hero-title">
-      <div>
-        <h2 id="hero-title">Who does your club do business with?</h2>
-        <p>Explore two-way transfer routes involving clubs from the Premier League, La Liga, Bundesliga, Serie A and Ligue 1.</p>
-      </div>
-      <div id="summary" class="cards summary-cards" aria-label="Dataset summary"></div>
-    </section>
-
-    <nav class="tabs" aria-label="Main navigation">
-      <button class="active" data-tab="routes">Route Explorer</button>
-      <button data-tab="leagues">League Rankings</button>
-      <button data-tab="about">About the data</button>
-    </nav>
-
-    <section id="routes" class="panel active">
-      <div class="section-heading">
-        <div><span class="kicker">Explore a relationship</span><h2>Choose two clubs</h2></div>
-        <p>Clubs are organised by country first. External partners appear under “Other clubs”.</p>
-      </div>
-
-      <div class="route-picker card">
-        <label>First club<select id="clubA" aria-label="First club"><option>Loading clubs…</option></select></label>
-        <span class="swap-mark" aria-hidden="true">↔</span>
-        <label>Second club<select id="clubB" aria-label="Second club"><option>Loading clubs…</option></select></label>
-        <button id="showRoute" class="btn primary">Show route</button>
-      </div>
-      <div id="pickerMessage" class="inline-message" aria-live="polite"></div>
+      <div id="routeMessage" class="message" hidden></div>
       <div id="routeView"></div>
-
-      <div class="section-heading routes-heading">
-        <div><span class="kicker">Browse</span><h2>All bidirectional routes</h2></div>
-        <p>Non-club states such as “Without Club”, “Retired” and “Career break” are excluded.</p>
-      </div>
-      <div class="filters card">
-        <label>Search routes<input id="routeSearch" type="search" placeholder="e.g. Chelsea, Marseille or Juventus" autocomplete="off"></label>
-        <label>League<select id="routeLeague"><option value="">All leagues</option></select></label>
-      </div>
-      <p id="routeCount" class="result-count"></p>
-      <div class="tablebox">
-        <table>
-          <thead><tr><th>Rank</th><th>Route</th><th>Total</th><th>Split</th><th>Players</th><th>Loans</th><th>Balance</th></tr></thead>
-          <tbody id="routeRows"></tbody>
-        </table>
-      </div>
     </section>
 
-    <section id="leagues" class="panel">
-      <div class="section-heading"><div><span class="kicker">League view</span><h2>Top 10 routes by league</h2></div><p>Each list includes routes where at least one club appeared in that league during the study period.</p></div>
-      <div id="leagueLists"></div>
-    </section>
-
-    <section id="about" class="panel">
-      <div class="section-heading"><div><span class="kicker">Trust and transparency</span><h2>About the data</h2></div><p>How the rankings are built, what is excluded, and where caution is needed.</p></div>
-      <div class="about-grid">
-        <article class="card"><h3>What counts as a route?</h3><p>One canonical row represents one player movement. A route qualifies only when at least one movement exists in each direction between two genuine clubs.</p></article>
-        <article class="card"><h3>What is excluded?</h3><p>Administrative states such as <strong>Without Club</strong>, <strong>Retired</strong>, <strong>Career break</strong>, <strong>Unknown</strong> and similar placeholders are retained in the raw transfer history but excluded from every club relationship ranking.</p></article>
-        <article class="card"><h3>Fees and loans</h3><p>Reported fees are estimates, not verified contractual amounts. Zero and missing values retain separate confidence labels. Loans are identified independently and shown explicitly.</p></article>
-        <article class="card"><h3>Quality checks</h3><p>Routes are checked for duplicate pairs, self-transfers, both-direction activity, reconciled totals and invalid non-club endpoints before publication.</p></article>
+    <section class="surface">
+      <div class="section-heading"><div><p class="eyebrow">All relationships</p><h2>Bidirectional routes</h2></div><span id="resultCount" class="muted"></span></div>
+      <div class="controls">
+        <input id="routeSearch" type="search" placeholder="Search club or route" aria-label="Search routes">
+        <select id="routeLeague" aria-label="Filter by league"><option value="">All leagues</option></select>
       </div>
-      <div class="card methodology-note"><h3>Current coverage</h3><p id="metaText"></p></div>
+      <div class="tablebox"><table><thead><tr><th>Rank</th><th>Route</th><th>Total</th><th>A → B</th><th>B → A</th><th>Players</th><th>Loans</th><th>Balance</th></tr></thead><tbody id="routeRows"></tbody></table></div>
     </section>
-  </main>
+  </section>
 
-  <footer><strong>Transfer Mates</strong><span>v0.1.0 Beta · RC1</span><span>Built for exploration, not transfer reporting.</span></footer>
-  <script src="app.js"></script>
+  <section id="leagues" class="panel">
+    <div class="section-heading"><div><p class="eyebrow">League view</p><h2>Top 10 bidirectional routes</h2></div></div>
+    <p class="note">Each list includes routes where at least one club appeared in the selected league during the study period. Non-club states are excluded.</p>
+    <div id="leagueLists"></div>
+  </section>
+
+  <section id="about" class="panel">
+    <div class="section-heading"><div><p class="eyebrow">Trust the result</p><h2>Methodology and safeguards</h2></div></div>
+    <div class="about-grid">
+      <article class="card"><h3>Canonical movements</h3><p>One row represents one player movement. Duplicate club-perspective records are removed during database construction.</p></article>
+      <article class="card"><h3>Bidirectional definition</h3><p>A route qualifies only where at least one eligible movement exists in each direction between two real clubs.</p></article>
+      <article class="card"><h3>Entity exclusions</h3><p>Administrative states such as “Without Club”, “Retired”, “Career break”, “Free agent” and unknown placeholders are excluded from route rankings.</p></article>
+      <article class="card"><h3>Fee caution</h3><p>Reported fees are estimates, not verified contractual amounts. Zero and missing values retain separate confidence labels.</p></article>
+    </div>
+    <div class="card"><p id="metaText"></p><p><a href="quality_report.json">View machine-readable quality report</a></p></div>
+  </section>
+</main>
+<footer><strong>Transfer Mates</strong><span>v0.1.1 beta · Data: 2015/16–2025/26</span></footer>
+<script src="app.js?v=011"></script>
 </body>
 </html>

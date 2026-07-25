@@ -1,0 +1,55 @@
+{
+  "version": "0.1.1",
+  "checks": [
+    {
+      "check": "No invalid route endpoints",
+      "status": "PASS",
+      "detail": "2508 routes checked"
+    },
+    {
+      "check": "No duplicate route pairs",
+      "status": "PASS",
+      "detail": "2508 unique pairs"
+    },
+    {
+      "check": "No self routes",
+      "status": "PASS",
+      "detail": "0 self routes"
+    },
+    {
+      "check": "All routes bidirectional",
+      "status": "PASS",
+      "detail": "both directions > 0"
+    },
+    {
+      "check": "Premier League rankings populated",
+      "status": "PASS",
+      "detail": "566 eligible routes"
+    },
+    {
+      "check": "La Liga rankings populated",
+      "status": "PASS",
+      "detail": "548 eligible routes"
+    },
+    {
+      "check": "Bundesliga rankings populated",
+      "status": "PASS",
+      "detail": "425 eligible routes"
+    },
+    {
+      "check": "Serie A rankings populated",
+      "status": "PASS",
+      "detail": "786 eligible routes"
+    },
+    {
+      "check": "Ligue 1 rankings populated",
+      "status": "PASS",
+      "detail": "545 eligible routes"
+    },
+    {
+      "check": "Route totals reconcile",
+      "status": "PASS",
+      "detail": "all totals equal direction sums"
+    }
+  ]
+}

@@ -1,32 +1,15 @@
-# Transfer Mates
+# Transfer Mates v0.1.1 beta
 
-Discover the hidden relationships behind football transfers.
+A static GitHub Pages site for exploring bidirectional football transfer relationships across Europe's Big Five leagues from 2015/16 to 2025/26.
 
-## Current release
+## Deploy
 
-**v0.1.0 Beta — RC1**
+Upload every file in this release to the root of the GitHub repository. No folders are required.
 
-The static GitHub Pages site covers canonical transfer movements involving clubs from Europe's Big Five leagues between 2015/16 and 2025/26.
+## v0.1.1 fixes
 
-## Publishing from a mobile or iPad
-
-The release deliberately uses a flat repository structure. Upload or replace all files directly in the repository root; no folders need to be created.
-
-Required files:
-- `index.html`
-- `styles.css`
-- `app.js`
-- `meta.json`
-- `clubs.json`
-- `routes.json`
-- `transfers.json`
-- `README.md`
-- `CHANGELOG.md`
-
-## Analytical safeguards
-
-- A route requires at least one movement in each direction.
-- Non-club states such as `Without Club`, `Retired`, `Career break`, `Unknown` and placeholders are excluded from rankings.
-- Route totals are reconciled to the underlying transfer records.
-- Duplicate pairs and self-routes are rejected during release validation.
-- Transfer fees are displayed as reported estimates and retain confidence labels.
+- Corrected the La Liga league-name mismatch (`Laliga` → `La Liga`).
+- Excluded non-club states such as `Without Club`, `Retired`, `Career break`, `Free agent` and placeholders from route analysis.
+- Re-ranked eligible routes after exclusions.
+- Grouped club selectors by country/league, with external clubs under `Other clubs`.
+- Added quality checks and improved route summaries, loading states and mobile layout.
