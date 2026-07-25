@@ -125,3 +125,6 @@
 }
 
 }
+[hidden] {
+    display: none !important;
+}
