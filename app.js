@@ -54,7 +54,7 @@ function init(){
             const b=$('#clubB').value;
 
             if(a && b)
-                refreshRelationship();
+                showPair(a,b,false);
 
         });
 
