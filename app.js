@@ -39,7 +39,7 @@ function init(){
     .querySelectorAll('.filter-btn')
     .forEach(btn=>{
 
-        btn.onclick=()=>{
+        btn.addEventListener("click", () => {
 
             document
                 .querySelectorAll('.filter-btn')
@@ -55,7 +55,7 @@ function init(){
             if(a && b)
                 showPair(a,b,false);
 
-        };
+        });
 
     });
   LEAGUE_ORDER.forEach(l=>$('#routeLeague').insertAdjacentHTML('beforeend',`<option value="${esc(l)}">${esc(l)}</option>`));
@@ -85,7 +85,7 @@ function showPair(a,b,scroll=true){
     const msg = $('#routeMessage');
 
     msg.hidden = true;
-  $('#transferFilter').hidden=true;
+
 
     if(!a || !b){
         msg.textContent = 'Choose two clubs to view a relationship.';
@@ -115,7 +115,6 @@ function showPair(a,b,scroll=true){
     msg.textContent =
         'This pair does not have eligible movements in both directions.';
     msg.hidden=false;
-    $('#transferFilter').hidden = false;
         $('#routeView').innerHTML='';
     return;
 }
