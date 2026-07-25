@@ -1,19 +1,17 @@
 # Changelog
 
-## v0.2.0 — TM-021A data engine
+## v0.2 TM-021B — Same-window exchanges
 
 ### Added
+- A visible **Same-window exchanges** section on every relationship page.
+- Expandable season/window cards showing the players moving in each direction.
+- Movement and loan counts for each qualifying window.
+- A clear empty state where a relationship is bidirectional overall but has no same-window exchange.
 
-- Precomputed `same_window_exchanges.json` for eligible bidirectional club relationships.
-- Canonical relationship IDs and route references.
-- Transfer-level detail for every qualifying season/window in both directions.
-- Loan flags and transfer types to support the forthcoming permanent/loan filter.
-- Browser-side schema and integrity validation when the data loads.
+### Data rules
+- A window qualifies only when at least one player moved in each direction during the same season and transfer window.
+- Non-club entities remain excluded.
+- The section reads from the precomputed and validated `same_window_exchanges.json` file introduced in TM-021A.
 
-### Definition
-
-A same-window exchange is a season and transfer window in which at least one eligible player movement occurred in each direction between the same two clubs. One-way windows are excluded.
-
-### Scope
-
-This task adds the TM-021A data engine only. No visible interface changes are included yet.
+### Next
+- TM-020: permanent/loan filtering, including recalculation of same-window exchanges.
